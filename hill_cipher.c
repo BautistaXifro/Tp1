@@ -1,31 +1,56 @@
 #include "hill_cipher.h"
+#include <math.h>
+#include <ctype.h>
 
 void hill_init(hill_cipher_t* self, char* key) {
     if (!self) {
         printf("Error. No se aceptan parametros nulos.\n");
     }
-    self->key = key;
+
+    memset(self->key, 0, sizeof(self->key));
+    strncpy(self->key, key, sizeof(self->key));
 }
 
-void hill_cipher(hill_cipher_t* self, unsigned char* msg, unsigned int* cipher_msg){
+void hill_filter_message(char* msg){
+    int i,j;
+    int max_long_string = strlen(msg);
+    char filter_msg[max_long_string];
+    i = j = 0;
+
+    for(i; i < max_long_string; i++){
+        if(isupper(msg[i])){
+            filter_msg[j] = msg[i];
+            j++;
+        }
+    }
+    filter_msg[j] = '\0';   
+    memset(msg,0,sizeof(msg));
+    strncpy(msg, filter_msg, strlen(filter_msg));
+}
+
+int hill_calculate_dimension(hill_cipher_t* self, unsigned char* msg){
+    int dimension = (int) sqrt(strlen(self->key));
+    int excess, long_cipher_array;
+    if((excess = strlen(msg) % 2)!= 0 && dimension % 2 == 0){
+        long_cipher_array = strlen(msg) + (dimension - excess);
+    }else{
+        long_cipher_array = strlen(msg);
+    }
+
+    return long_cipher_array;
+}
+
+//devuelve la longitud del vector numerico
+void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
     if(!msg){
         printf("Error!! el mensaje es nulo\n");
         return;
     }
 
-    int dimension = (int) sqrt(strlen(self->key));
-    int long_cipher_vector;
     int aux = 0;
+    int dimension = (int) sqrt(strlen(self->key));
     int key_array[strlen(self->key)];
     int msg_numeric_array[strlen(msg)];
-
-    if(strlen(msg) % 2 != 0){
-        long_cipher_vector = strlen(msg) + 1;
-    }else{
-        long_cipher_vector = strlen(msg);
-    }
-
-    cipher_msg[long_cipher_vector];
 
     //mapeo el mensaje y la key a un array numerico siguiendo a0z25
     hill_numeric_maping(msg, msg_numeric_array);
@@ -48,8 +73,6 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, unsigned int* cipher_m
         }
         aux += dimension;
     }
-
-    memset(msg,0,sizeof(msg));
 }
 
 static void hill_numeric_maping(unsigned char* string, int* array){
@@ -169,7 +192,7 @@ static void hill_numeric_maping(unsigned char* string, int* array){
     }
 }
 
-static void hill_char_maping(unsigned char* string, int* array, int size){
+void hill_char_maping(unsigned char* string, int* array, int size){
     for(int i = 0; i < size; i++){
         string[i + 1] = '\n';
         switch (array[i])
@@ -290,5 +313,5 @@ void hill_destroy(hill_cipher_t* self) {
     if (!self) {
         return;
     }
-    self->key = NULL;
+    memset(self->key, 0, sizeof(self->key));
 }

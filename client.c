@@ -1,51 +1,58 @@
 #include "hill_cipher.h"
-#include <ctype.h>
+#include "common_file_reader.h"
+#include "client.h"
 
+#define BUF_MAX_LEN 64
 
-void filter_message(char* msg){
-    int i,j;
-    int max_long_string = strlen(msg);
-    char filter_msg[max_long_string];
-    i = j = 0;
+int client_init(client_t* self, char* server_name, char* port) {
+    if(self == NULL) return -1;
+    socket_init(&self->socket);
 
-    for(i; i < max_long_string; i++){
-        if(isupper(msg[i])){
-            filter_msg[j] = msg[i];
-            j++;
-        }
+    if (socket_connect(&self->socket, server_name, port)) {
+        printf("Error al conectarse al servidor.");
+        return -1;
     }
-    filter_msg[j] = '\0';   
-    memset(msg,0,sizeof(msg));
-    strncpy(msg, filter_msg, strlen(filter_msg));
+
+    return 0;
+}
+
+int client_send(client_t* self,char* file_name){
+    if (!self) {
+        return -1;
+    }
+    
+    int bytes_receive;
+    file_reader_t file_reader;
+    file_reader_init(&file_reader, file_name);
+
+    unsigned char msg[BUF_MAX_LEN];
+
+    while (!file_reader_eof(&file_reader)) {
+        int* cipher_numeric_msg;
+        int bytes_read = file_reader_read(&file_reader, msg, BUF_MAX_LEN);
+
+        if (bytes_read == -1) {
+            printf("Error al leer el archivo\n");
+            return -1;
+        }
+        
+        socket_send_msg(&self->socket, msg, bytes_read);
+        short length_numeric_msg = socket_receive_length(&self->socket);
+        cipher_numeric_msg = malloc(length_numeric_msg * sizeof(int));
+        bytes_receive = socket_receive_numeric(&self->socket, cipher_numeric_msg, length_numeric_msg);
+        hill_char_maping(msg,cipher_numeric_msg, bytes_receive);
+        free(cipher_numeric_msg);
+        printf("%s", msg);
+    }
+
+    file_reader_destroy(&file_reader);
+    client_close(self);
+    return 0;
 }
 
 
-int main(int argc, char** argv){
-    char msg[20];
-    //cipher_msg = (int*) malloc(100 * sizeof(int));
-    hill_cipher_t hill;
-    printf("ingrese un text: ");
-    if(scanf("%s",msg) != 1){
-        printf("Error al leer el mensaje\n");
+void client_close(client_t* self) {
+    if (self) {
+        socket_close(&self->socket);
     }
-    
-    hill_init(&hill, "CDIB");
-
-    filter_message(msg);
-
-    printf("%s\n", msg);
-
-    printf("%s\n", hill.key);
-
-    hill_cipher(&hill,msg, cipher_msg);
-
-    for(int i = 0; i < strlen(msg) + 1; i++){
-        printf("%i", cipher_msg[i]);
-    }
-
-    printf("%s\n", msg);
-
-    hill_destroy(&hill);
-
-    return 0;
 }
