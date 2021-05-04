@@ -1,5 +1,5 @@
-#ifndef __COMMON_FILE_READER_H__
-#define __COMMON_FILE_READER_H__
+#ifndef __CLIENT_FILE_READER_H__
+#define __CLIENT_FILE_READER_H__
 #include <stdio.h>
 
 typedef struct file_reader {
