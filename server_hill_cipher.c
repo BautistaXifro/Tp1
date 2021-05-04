@@ -17,7 +17,7 @@ void hill_init(hill_cipher_t* self, char* key) {
 void hill_filter_message(char* msg){
     int j = 0;
     const int maxLongString = strlen(msg);
-    char filter_msg[maxLongString];
+    char* filter_msg =(char *) malloc(maxLongString * sizeof(char));
 
     for (int i = 0; i < maxLongString; i++){
         if (isupper(msg[i])){
@@ -28,12 +28,13 @@ void hill_filter_message(char* msg){
     filter_msg[j] = '\0';
     memset(msg,0,strlen(msg));
     snprintf(msg, maxLongString, "%s", filter_msg);
+    free(filter_msg);
 }
 
 int hill_calculate_dimension(hill_cipher_t* self, unsigned char* msg){
     int dimension = (int) sqrt(strlen(self->key));
     int excess, long_cipher_array;
-    if ((excess = strlen((char *) msg) % 2)!= 0 && dimension % 2 == 0){
+    if ((excess = strlen((char *) msg) % dimension)!= 0){
         long_cipher_array = strlen((char *) msg) + (dimension - excess);
     }else{
         long_cipher_array = strlen((char *) msg);
@@ -54,7 +55,8 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
     const int msgNumericArrayLength = strlen((char *) msg);
     int dimension = (int) sqrt(strlen(self->key));
     int* key_array = (int *) malloc(keyArrayLength * sizeof(int));
-    int* msg_numeric_array = (int *) malloc(msgNumericArrayLength * sizeof(int));
+    int* msg_numeric_array = (int *)
+         malloc(msgNumericArrayLength * sizeof(int));
 
     //mapeo el mensaje y la key a un array numerico siguiendo a0z25
     hill_numeric_maping((char *)msg, msg_numeric_array);
