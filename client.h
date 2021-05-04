@@ -14,7 +14,8 @@ int client_receive_length_msg(client_t* self);
 
 void client_send_length_msg(client_t* self, int length);
 
-void client_receive_numeric(client_t* self, int* cipher_numeric_msg, int length_numeric_msg);
+void client_receive_numeric(client_t* self, int* cipher_numeric_msg,
+                            int length_numeric_msg);
 
 void char_maping(unsigned char* string, int* array, int size);
 

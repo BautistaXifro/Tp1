@@ -1,8 +1,7 @@
 #include "client.h"
 
 int main(int argc, char* argv[]){
-    
-    if(argc < 4){
+    if (argc < 4){
         printf("El cliente tiene formato ./client server_name port filepath\n");
         return -1;
     }

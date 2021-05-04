@@ -6,7 +6,7 @@
 #define LENGTH_MSG 2
 
 int client_init(client_t* self, char* server_name, char* port) {
-    if(self == NULL) return -1;
+    if (self == NULL) return -1;
     socket_init(&self->socket);
 
     if (socket_connect(&self->socket, server_name, port)) {
@@ -47,9 +47,10 @@ int client_send(client_t* self,char* file_name){
     return 0;
 }
 
-void client_receive_numeric(client_t* self, int* cipher_numeric_msg, int length_numeric_msg){
+void client_receive_numeric(client_t* self, int* cipher_numeric_msg,
+                            int length_numeric_msg){
     unsigned char buffer[sizeof(uint32_t)];
-    for(int i = 0; i < length_numeric_msg; i++){
+    for (int i = 0; i < length_numeric_msg; i++){
         socket_receive(&self->socket, buffer, sizeof(uint32_t));
         uint32_t aux = *(uint32_t*)(buffer);
         cipher_numeric_msg[i] = (int) ntohl((uint32_t) aux);
@@ -67,9 +68,8 @@ void client_send_length_msg(client_t* self, int length){
 }
 
 int client_receive_length_msg(client_t* self){
-
     unsigned char buffer[sizeof(uint16_t)];
-    if(socket_receive(&self->socket, buffer, LENGTH_MSG) <= 0){
+    if (socket_receive(&self->socket, buffer, LENGTH_MSG) <= 0){
         return -1;
     }
     uint16_t max_bytes = *(uint16_t*)(buffer);
@@ -79,7 +79,7 @@ int client_receive_length_msg(client_t* self){
 }
 
 void char_maping(unsigned char* string, int* array, int size){
-    for(int i = 0; i < size; i++){
+    for (int i = 0; i < size; i++){
         string[i + 1] = '\n';
         switch (array[i])
         {
@@ -190,9 +190,7 @@ void char_maping(unsigned char* string, int* array, int size){
         default:
             printf("Error no es un int\n"); 
             break;
-
-        }
-        
+        } 
     }
 }
 

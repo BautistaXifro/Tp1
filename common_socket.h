@@ -24,7 +24,8 @@ int socket_bind(socket_t* self, const char* port);
 
 int socket_accept(socket_t* self, socket_t* server);
 
-int socket_send(socket_t* self, const unsigned char* msg, unsigned int msg_length);
+int socket_send(socket_t* self, const unsigned char* msg,
+                unsigned int msg_length);
 
 int socket_receive(socket_t* self, unsigned char* buffer, int max_bytes);
 

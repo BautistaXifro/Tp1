@@ -4,7 +4,6 @@
 
 
 int main(int argc, char* argv[]) {
-
 	if(argc < 3){
 		printf("El servidor tiene formato ./server port key\n");
 		return -1;

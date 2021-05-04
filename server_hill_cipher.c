@@ -7,6 +7,7 @@ static void hill_numeric_maping(char* string, int* array);
 void hill_init(hill_cipher_t* self, char* key) {
     if (!self) {
         printf("Error. No se aceptan parametros nulos.\n");
+        return;
     }
 
     memset(self->key, 0, sizeof(self->key));
@@ -15,24 +16,24 @@ void hill_init(hill_cipher_t* self, char* key) {
 
 void hill_filter_message(char* msg){
     int j = 0;
-    int max_long_string = strlen(msg);
-    char filter_msg[max_long_string];
+    const int maxLongString = strlen(msg);
+    char filter_msg[maxLongString];
 
-    for(int i = 0; i < max_long_string; i++){
-        if(isupper(msg[i])){
+    for (int i = 0; i < maxLongString; i++){
+        if (isupper(msg[i])){
             filter_msg[j] = msg[i];
             j++;
         }
     }
     filter_msg[j] = '\0';
     memset(msg,0,strlen(msg));
-    strcpy(msg, filter_msg);
+    snprintf(msg, maxLongString, "%s", filter_msg);
 }
 
 int hill_calculate_dimension(hill_cipher_t* self, unsigned char* msg){
     int dimension = (int) sqrt(strlen(self->key));
     int excess, long_cipher_array;
-    if((excess = strlen((char *) msg) % 2)!= 0 && dimension % 2 == 0){
+    if ((excess = strlen((char *) msg) % 2)!= 0 && dimension % 2 == 0){
         long_cipher_array = strlen((char *) msg) + (dimension - excess);
     }else{
         long_cipher_array = strlen((char *) msg);
@@ -43,27 +44,29 @@ int hill_calculate_dimension(hill_cipher_t* self, unsigned char* msg){
 
 //devuelve la longitud del vector numerico
 void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
-    if(!msg){
+    if (!msg){
         printf("Error!! el mensaje es nulo\n");
         return;
     }
 
     int aux = 0;
+    const int keyArrayLength = strlen(self->key);
+    const int msgNumericArrayLength = strlen((char *) msg);
     int dimension = (int) sqrt(strlen(self->key));
-    int key_array[strlen(self->key)];
-    int msg_numeric_array[strlen((char *) msg)];
+    int key_array[keyArrayLength];
+    int msg_numeric_array[msgNumericArrayLength];
 
     //mapeo el mensaje y la key a un array numerico siguiendo a0z25
     hill_numeric_maping((char *)msg, msg_numeric_array);
     hill_numeric_maping(self->key, key_array);
 
     
-    while(aux < strlen((char *) msg)){
+    while (aux < strlen((char *) msg)){
         int position = 0;
-        for(int i = 0; i < dimension; i++){
+        for (int i = 0; i < dimension; i++){
             int suma = 0;
-            for(int j = 0; j < dimension; j++){
-                if(j + aux >= strlen((char *)msg)){
+            for (int j = 0; j < dimension; j++){
+                if (j + aux >= strlen((char *)msg)){
                     suma += key_array[position] * 0;
                 }else{
                     suma += key_array[position] * msg_numeric_array[j + aux];
@@ -77,7 +80,7 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
 }
 
 static void hill_numeric_maping(char* string, int* array){
-    for(int i = 0; i < strlen(string); i++){
+    for (int i = 0; i < strlen(string); i++){
         switch (string[i])
         {
         case 'A':
@@ -187,9 +190,7 @@ static void hill_numeric_maping(char* string, int* array){
         default:
             printf("Error no es un char\n"); 
             break;
-
         }
-        
     }
 }
 

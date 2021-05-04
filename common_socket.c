@@ -2,14 +2,15 @@
 #include <stdlib.h>
 
 void socket_init(socket_t* self) {
-    if(self == NULL){
+    if (self == NULL){
         printf("Error socket es nulo");
         return;
     }
     self->fd = -1; 
 }
 
-int _getaddrinfo(struct addrinfo** serv_info, const char* hostname, const char* port) {
+int _getaddrinfo(struct addrinfo** serv_info, const char* hostname,
+                const char* port) {
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
@@ -37,8 +38,10 @@ int socket_connect(socket_t* self, const char* hostname, const char* port) {
     int connected = 0;
 
     for (; serv_info && !connected; serv_info = serv_info->ai_next) {
-        self->fd = socket(serv_info->ai_family, serv_info->ai_socktype, serv_info->ai_protocol);
-        if (connect(self->fd, serv_info->ai_addr, serv_info->ai_addrlen) == -1) {
+        self->fd = socket(serv_info->ai_family, serv_info->ai_socktype,
+                        serv_info->ai_protocol);
+        if (connect(self->fd, serv_info->ai_addr,
+                    serv_info->ai_addrlen) == -1) {
             close(self->fd);
         } else {
             connected = 1;
@@ -54,7 +57,7 @@ int socket_connect(socket_t* self, const char* hostname, const char* port) {
 }
 
 int socket_bind(socket_t* self, const char* port) {
-    if(self == NULL || port == NULL) return -1;
+    if (self == NULL || port == NULL) return -1;
     struct addrinfo* serv_info;
 
     if (_getaddrinfo(&serv_info, NULL, port)) {
@@ -65,12 +68,13 @@ int socket_bind(socket_t* self, const char* port) {
     struct addrinfo* head = serv_info;
 
     for (; serv_info && !connected; serv_info = serv_info->ai_next) {
-        self->fd = socket(serv_info->ai_family, serv_info->ai_socktype, serv_info->ai_protocol);
+        self->fd = socket(serv_info->ai_family, serv_info->ai_socktype,
+                         serv_info->ai_protocol);
 
         int val = 1;
         setsockopt(self->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
 
-        if ( bind( self->fd, serv_info->ai_addr, serv_info->ai_addrlen) < 0){
+        if (bind( self->fd, serv_info->ai_addr, serv_info->ai_addrlen) < 0){
             perror("bind");
             printf("%sn \n",strerror(errno));
         } else {
@@ -85,7 +89,7 @@ int socket_bind(socket_t* self, const char* port) {
 }
 
 int socket_accept(socket_t* self, socket_t* server) {
-    if(self == NULL || server == NULL) return -1;
+    if (self == NULL || server == NULL) return -1;
 
     struct sockaddr_in address;
     socklen_t address_length = (socklen_t)sizeof(address);
@@ -101,7 +105,7 @@ int socket_accept(socket_t* self, socket_t* server) {
 }
 
 int socket_receive(socket_t* self, unsigned char* buffer, int msg_length){
-    if(self == NULL || buffer == NULL ) return -1;
+    if (self == NULL || buffer == NULL) return -1;
     
     int bytes_received = 0;
     int max_bytes = msg_length;
@@ -128,8 +132,9 @@ int socket_receive(socket_t* self, unsigned char* buffer, int msg_length){
     return bytes_received;
 }
 
-int socket_send(socket_t* self, const unsigned char* msg, unsigned int msg_length) {
-    if(self == NULL || msg == NULL) return -1;
+int socket_send(socket_t* self, const unsigned char* msg,
+                unsigned int msg_length) {
+    if (self == NULL || msg == NULL) return -1;
 
     if (msg_length == 0) {
         return 0;
@@ -139,7 +144,8 @@ int socket_send(socket_t* self, const unsigned char* msg, unsigned int msg_lengt
     int total_send = 0;
 
     while (total_send < msg_length) {
-        int bytes = send(self->fd, &msg[total_send], bytes_pending, MSG_NOSIGNAL);
+        int bytes = send(self->fd, &msg[total_send],
+                         bytes_pending, MSG_NOSIGNAL);
 
         if (bytes == -1 || bytes == 0) {
             break;

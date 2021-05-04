@@ -15,7 +15,8 @@ int server_receive_length_msg(server_t* self);
 
 void server_send_length_msg(server_t* self, int numeric_msg_length);
 
-void server_send_numeric(server_t* self, int* numeric_msg, int numeric_msg_length);
+void server_send_numeric(server_t* self, int* numeric_msg,
+                        int numeric_msg_length);
 
 void server_close(server_t* self);
 

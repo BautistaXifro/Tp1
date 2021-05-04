@@ -5,7 +5,7 @@
 #define LENGTH_MSG 2
 
 void server_init(server_t* self, char* port){
-    if(self == NULL){
+    if (self == NULL){
         printf("Error al crear el servidor, self es nulo.");
         return;
     }
@@ -52,9 +52,8 @@ void server_cipher_message(server_t* self, char* key){
 
 
 int server_receive_length_msg(server_t* self){
-
     unsigned char buffer[LENGTH_MSG];
-    if(socket_receive(&self->client_socket, buffer, LENGTH_MSG) <= 0){
+    if (socket_receive(&self->client_socket, buffer, LENGTH_MSG) <= 0){
         return -1;
     }
     uint16_t max_bytes = *(uint16_t*)(buffer);
@@ -64,7 +63,6 @@ int server_receive_length_msg(server_t* self){
 }
 
 void server_send_length_msg(server_t* self, int length){
-    
     uint16_t msg_length = length;
     msg_length = htons(msg_length);
     unsigned char buffer[sizeof(msg_length)];
@@ -73,9 +71,9 @@ void server_send_length_msg(server_t* self, int length){
     socket_send(&self->client_socket, buffer, sizeof(uint16_t));
 }
 
-void server_send_numeric(server_t* self, int* numeric_msg, int numeric_msg_length){
-    for(int i = 0; i < numeric_msg_length; i++){
-        
+void server_send_numeric(server_t* self, int* numeric_msg,
+                        int numeric_msg_length){
+    for (int i = 0; i < numeric_msg_length; i++){
         uint32_t send_int = htonl((uint32_t) numeric_msg[i]);
         unsigned char buffer[sizeof(send_int)];
         memcpy(buffer, (char*)&send_int,sizeof(uint32_t));
