@@ -8,9 +8,7 @@ typedef struct file_reader {
 
 int file_reader_init(file_reader_t* self, char* file_name);
 
-int file_reader_read(file_reader_t* self, unsigned char* buf, unsigned int bufLength);
-
-int file_reader_eof(file_reader_t* self);
+int file_reader_read(file_reader_t* self, char* buf, unsigned int bufLength);
 
 void file_reader_destroy(file_reader_t* self);
 

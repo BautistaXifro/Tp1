@@ -1,6 +1,8 @@
 #include "server.h"
-#include "hill_cipher.h"
+#include "server_hill_cipher.h"
 #include <math.h>
+#define BUF_MAX_LEN 255
+#define LENGTH_MSG 2
 
 void server_init(server_t* self, char* port){
     if(self == NULL){
@@ -28,39 +30,64 @@ void server_cipher_message(server_t* self, char* key){
 
     hill_cipher_t cipher;
     hill_init(&cipher, key);
-    int buff_length;
-    int bytes_received = 0;
-    int numeric_msg_length;
-    unsigned char buf[6];
+    int msg_received_length = 0;
+    unsigned char buf[BUF_MAX_LEN];
 
-    while (bytes_received = socket_receive_msg(&self->client_socket, buf)) {
+    while ((msg_received_length = server_receive_length_msg(self)) > 0) {
+        socket_receive(&self->client_socket, buf, msg_received_length);
         int* numeric_msg;
-        hill_filter_message(buf);
-        numeric_msg_length = hill_calculate_dimension(&cipher, buf);
-        numeric_msg = malloc(numeric_msg_length * sizeof(int));
+        hill_filter_message((char *) buf);
+        int numeric_msg_length = hill_calculate_dimension(&cipher, buf);
+        numeric_msg = (int *) malloc(numeric_msg_length * sizeof(int));
         hill_cipher(&cipher, buf, numeric_msg);
-        server_send(self->client_socket, numeric_msg, numeric_msg_length);
+        //SEND---------------------------------------------------
+        server_send_length_msg(self, numeric_msg_length);
+        server_send_numeric(self, numeric_msg, numeric_msg_length);
         free(numeric_msg);
+        memset(buf, 0 ,sizeof(buf));
     }
-
     hill_destroy(&cipher);
     server_close(self);
 }
 
 
-void server_send(server_t* self, int* numeric_msg, int msg_length){
-    if(self == NULL) return;
+int server_receive_length_msg(server_t* self){
 
-    int bytes_send = 0;
+    unsigned char buffer[LENGTH_MSG];
+    if(socket_receive(&self->client_socket, buffer, LENGTH_MSG) <= 0){
+        return -1;
+    }
+    uint16_t max_bytes = *(uint16_t*)(buffer);
+    max_bytes = ntohs(max_bytes);
 
-    socket_send_numeric(&self->client_socket, numeric_msg, msg_length);
+    return (int) max_bytes;
+}
 
+void server_send_length_msg(server_t* self, int length){
+    
+    uint16_t msg_length = length;
+    msg_length = htons(msg_length);
+    unsigned char buffer[sizeof(msg_length)];
+    memcpy(buffer, (char*)&msg_length,sizeof(uint16_t));
+
+    socket_send(&self->client_socket, buffer, sizeof(uint16_t));
+}
+
+void server_send_numeric(server_t* self, int* numeric_msg, int numeric_msg_length){
+    for(int i = 0; i < numeric_msg_length; i++){
+        
+        uint32_t send_int = htonl((uint32_t) numeric_msg[i]);
+        unsigned char buffer[sizeof(send_int)];
+        memcpy(buffer, (char*)&send_int,sizeof(uint32_t));
+
+        socket_send(&self->client_socket, buffer, sizeof(uint32_t));
+    }
 }
 
 void server_close(server_t* self){
     if (self == NULL) {
-    printf("Error al cerrar el servidor, self es nulo.");
-    return;
+        printf("Error al cerrar el servidor, self es nulo.");
+        return;
     }
 
     socket_close(&self->client_socket);

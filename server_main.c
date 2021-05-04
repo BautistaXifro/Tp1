@@ -1,7 +1,4 @@
-#include "common_arginfo.h"
 #include "server.h"
-
-#include <getopt.h>
 #include <stdlib.h>
 
 
@@ -18,7 +15,7 @@ int main(int argc, char* argv[]) {
 	server_init(&server, argv[1]);
 
 	server_cipher_message(&server, argv[2]);
-	
+
 	server_close(&server);
 
 	return 0;

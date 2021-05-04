@@ -56,7 +56,7 @@ CFLAGS += -D _POSIX_C_SOURCE=200809L
 #static = si
 
 # Si se quiere simular pÃ©rdidas, descomentar la siguiente linea
-wrapsocks = si
+wrapsocks = no
 
 
 # VARIABLES CALCULADAS A PARTIR DE LA CONFIGURACION

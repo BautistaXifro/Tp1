@@ -11,22 +11,26 @@ int file_reader_init(file_reader_t* self, char* file_name) {
         return 0;
     }
     
-    self->file = fopen(file_name, FILE_MODE);
+    if((self->file = fopen(file_name, FILE_MODE)) == NULL) return -1;
     return 0;
-
 }
 
-int file_reader_read(file_reader_t* self, unsigned char* buf, unsigned int bufLength) {
+int file_reader_read(file_reader_t* self, char* buf, unsigned int bufLength) {
     if (!self) {
         return -1;
     }
 
-    int bytes_read = fread(buf, 1, bufLength, self->file);
-    return bytes_read;
-}
+    char* return_value = fgets(buf, bufLength, self->file);
 
-int file_reader_eof(file_reader_t* self) { 
-    return feof(self->file);
+    while(strcmp(buf, "\n") == 0 && return_value == NULL){
+        return_value = fgets(buf, bufLength, self->file);
+    }
+
+    if(return_value == NULL){
+        return 1;
+    }
+
+    return 0;
 }
 
 void file_reader_destroy(file_reader_t* self) {
