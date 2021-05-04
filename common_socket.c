@@ -74,7 +74,7 @@ int socket_bind(socket_t* self, const char* port) {
         int val = 1;
         setsockopt(self->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
 
-        if (bind( self->fd, serv_info->ai_addr, serv_info->ai_addrlen) < 0){
+        if (bind(self->fd, serv_info->ai_addr, serv_info->ai_addrlen) < 0){
             perror("bind");
             printf("%sn \n",strerror(errno));
         } else {

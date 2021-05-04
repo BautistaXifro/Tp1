@@ -6,7 +6,7 @@
 int file_reader_init(file_reader_t* self, char* file_name) {
     if (self == NULL) return -1;
     
-    if (strcmp (file_name,"-") == 0) {
+    if (strcmp(file_name,"-") == 0) {
         self->file = stdin;
         return 0;
     }

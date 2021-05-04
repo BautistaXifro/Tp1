@@ -53,8 +53,8 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
     const int keyArrayLength = strlen(self->key);
     const int msgNumericArrayLength = strlen((char *) msg);
     int dimension = (int) sqrt(strlen(self->key));
-    int key_array[keyArrayLength];
-    int msg_numeric_array[msgNumericArrayLength];
+    int* key_array = (int *) malloc(keyArrayLength * sizeof(int));
+    int* msg_numeric_array = (int *) malloc(msgNumericArrayLength * sizeof(int));
 
     //mapeo el mensaje y la key a un array numerico siguiendo a0z25
     hill_numeric_maping((char *)msg, msg_numeric_array);
@@ -77,6 +77,8 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
         }
         aux += dimension;
     }
+    free(key_array);
+    free(msg_numeric_array);
 }
 
 static void hill_numeric_maping(char* string, int* array){
