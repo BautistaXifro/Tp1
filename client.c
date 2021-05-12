@@ -2,9 +2,9 @@
 #include "client.h"
 #include <stdlib.h>
 
-#define BUF_MAX_LEN 255
+#define BUF_MAX_LEN 256
 #define LENGTH_MSG 2
-#define SIZEOFUNIT 4
+#define SIZE_OF_UNIT 4
 
 int client_init(client_t* self, char* server_name, char* port) {
     if (self == NULL) return -1;
@@ -34,7 +34,7 @@ int client_send(client_t* self,char* file_name){
         socket_send(&self->socket, msg, aux);
         //RECEIVE----------------------------------------
         int length_numeric_msg = client_receive_length_msg(self);
-        int cipher_numeric_msg[length_numeric_msg];
+        int cipher_numeric_msg[BUF_MAX_LEN + 3];
         client_receive_numeric(self, cipher_numeric_msg, length_numeric_msg);
         memset(msg, 0, sizeof(msg));
         char_maping(msg,cipher_numeric_msg, length_numeric_msg);
@@ -48,7 +48,7 @@ int client_send(client_t* self,char* file_name){
 
 void client_receive_numeric(client_t* self, int* cipher_numeric_msg,
                             int length_numeric_msg){
-    unsigned char buffer[SIZEOFUNIT];
+    unsigned char buffer[SIZE_OF_UNIT];
     for (int i = 0; i < length_numeric_msg; i++){
         socket_receive(&self->socket, buffer, sizeof(buffer));
         uint32_t aux = *(uint32_t*)(buffer);

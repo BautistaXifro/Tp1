@@ -1,7 +1,7 @@
 #include "server.h"
 #include "server_hill_cipher.h"
 #include <math.h>
-#define BUF_MAX_LEN 255
+#define BUF_MAX_LEN 256
 #define LENGTH_MSG 2
 
 void server_init(server_t* self, char* port){
@@ -37,7 +37,7 @@ void server_cipher_message(server_t* self, char* key){
         socket_receive(&self->client_socket, buf, msg_received_length);
         hill_filter_message((char *) buf);
         int numeric_msg_length = hill_calculate_dimension(&cipher, buf);
-        int numeric_msg[numeric_msg_length];
+        int numeric_msg[BUF_MAX_LEN + 3];
         hill_cipher(&cipher, buf, numeric_msg);
         //SEND---------------------------------------------------
         server_send_length_msg(self, numeric_msg_length);
