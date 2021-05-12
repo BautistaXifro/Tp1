@@ -20,17 +20,12 @@ int file_reader_read(file_reader_t* self, char* buf, unsigned int bufLength) {
         return -1;
     }
 
-    char* return_value = fgets(buf, bufLength, self->file);
-
-    while (strcmp(buf, "\n") == 0 && return_value == NULL){
-        return_value = fgets(buf, bufLength, self->file);
+    while (fgets(buf, bufLength, self->file) != NULL){
+        if (strcmp(buf, "\n") == 0){
+            continue;
+        }else return 0;
     }
-
-    if (return_value == NULL){
-        return 1;
-    }
-
-    return 0;
+    return 1;
 }
 
 void file_reader_destroy(file_reader_t* self) {

@@ -73,7 +73,7 @@ void server_send_length_msg(server_t* self, int length){
 void server_send_numeric(server_t* self, int* numeric_msg,
                         int numeric_msg_length){
     for (int i = 0; i < numeric_msg_length; i++){
-        uint32_t send_int = htonl((uint32_t) numeric_msg[i]);
+        uint16_t send_int = htons((uint16_t) numeric_msg[i]);
         unsigned char buffer[sizeof(send_int)];
         memcpy(buffer, (char*)&send_int,sizeof(send_int));
 

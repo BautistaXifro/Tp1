@@ -4,7 +4,7 @@
 
 #define BUF_MAX_LEN 256
 #define LENGTH_MSG 2
-#define SIZE_OF_UNIT 4
+#define SIZE_OF_UNIT 2
 
 int client_init(client_t* self, char* server_name, char* port) {
     if (self == NULL) return -1;
@@ -49,11 +49,11 @@ int client_send(client_t* self,char* file_name){
 
 void client_receive_numeric(client_t* self, int* cipher_numeric_msg,
                             int length_numeric_msg){
-    unsigned char buffer[SIZE_OF_UNIT];
+    unsigned char buffer[LENGTH_MSG];
     for (int i = 0; i < length_numeric_msg; i++){
         socket_receive(&self->socket, buffer, sizeof(buffer));
-        uint32_t aux = *(uint32_t*)(buffer);
-        cipher_numeric_msg[i] = (int) ntohl(aux);
+        uint16_t aux = *(uint16_t*)(buffer);
+        cipher_numeric_msg[i] = (int) ntohs(aux);
     }
 }
 
