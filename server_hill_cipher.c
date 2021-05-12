@@ -2,6 +2,9 @@
 #include <math.h>
 #include <ctype.h>
 
+#define MAXKEYLENGTH 16
+#define MAXMSGLENGTH 256
+
 static void hill_numeric_maping(char* string, int* array);
 
 void hill_init(hill_cipher_t* self, char* key) {
@@ -17,7 +20,7 @@ void hill_init(hill_cipher_t* self, char* key) {
 void hill_filter_message(char* msg){
     int j = 0;
     const int maxLongString = strlen(msg);
-    char* filter_msg =(char *) malloc(maxLongString * sizeof(char));
+    char filter_msg[MAXMSGLENGTH];
 
     for (int i = 0; i < maxLongString; i++){
         if (isupper(msg[i])){
@@ -28,7 +31,6 @@ void hill_filter_message(char* msg){
     filter_msg[j] = '\0';
     memset(msg,0,strlen(msg));
     snprintf(msg, maxLongString, "%s", filter_msg);
-    free(filter_msg);
 }
 
 int hill_calculate_dimension(hill_cipher_t* self, unsigned char* msg){
@@ -51,12 +53,10 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
     }
 
     int aux = 0;
-    const int keyArrayLength = strlen(self->key);
-    const int msgNumericArrayLength = strlen((char *) msg);
     int dimension = (int) sqrt(strlen(self->key));
-    int* key_array = (int *) malloc(keyArrayLength * sizeof(int));
-    int* msg_numeric_array = (int *)
-         malloc(msgNumericArrayLength * sizeof(int));
+    int key_array[MAXKEYLENGTH];
+    int msg_numeric_array[MAXMSGLENGTH];
+
 
     //mapeo el mensaje y la key a un array numerico siguiendo a0z25
     hill_numeric_maping((char *)msg, msg_numeric_array);
@@ -79,122 +79,12 @@ void hill_cipher(hill_cipher_t* self, unsigned char* msg, int* cipher_msg){
         }
         aux += dimension;
     }
-    free(key_array);
-    free(msg_numeric_array);
 }
 
 static void hill_numeric_maping(char* string, int* array){
     for (int i = 0; i < strlen(string); i++){
-        switch (string[i])
-        {
-        case 'A':
-            array[i] = 0;
-            break;
-
-        case 'B':
-            array[i] = 1;
-            break;
-        
-        case 'C':
-            array[i] = 2;
-            break;
-
-        case 'D':
-            array[i] = 3;
-            break;
-
-        case 'E':
-            array[i] = 4;
-            break;
-
-        case 'F':
-            array[i] = 5;
-            break;
-        
-        case 'G':
-            array[i] = 6;
-            break;
-        
-        case 'H':
-            array[i] = 7;
-            break;
-        
-        case 'I':
-            array[i] = 8;
-            break;
-        
-        case 'J':
-            array[i] = 9;
-            break;
-        
-        case 'K':
-            array[i] = 10;
-            break;
-        
-        case 'L':
-            array[i] = 11;
-            break;
-        
-        case 'M':
-            array[i] = 12;
-            break;
-        
-        case 'N':
-            array[i] = 13;
-            break;
-        
-        case 'O':
-            array[i] = 14;
-            break;
-        
-        case 'P':
-            array[i] = 15;
-            break;
-        
-        case 'Q':
-            array[i] = 16;
-            break;
-        
-        case 'R':
-            array[i] = 17;
-            break;
-        
-        case 'S':
-            array[i] = 18;
-            break;
-        
-        case 'T':
-            array[i] = 19;
-            break;
-        
-        case 'U':
-            array[i] = 20;
-            break;
-        
-        case 'V':
-            array[i] = 21;
-            break;
-        
-        case 'W':
-            array[i] = 22;
-            break;
-        
-        case 'X':
-            array[i] = 23;
-            break;
-        
-        case 'Y':
-            array[i] = 24;
-            break;
-
-        case 'Z':
-            array[i] = 25;
-            break;
-
-        default:
-            printf("Error no es un char\n"); 
-            break;
-        }
+        int numeber_char = string[i];
+        array[i] = numeber_char - 65;
     }
 }
 

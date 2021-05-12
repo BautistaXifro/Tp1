@@ -17,7 +17,7 @@ void server_init(server_t* self, char* port){
     }
 
     socket_init(&self->client_socket);
-    if (socket_accept(&self->client_socket, &self->server_socket)) {
+    if (socket_accept(&self->client_socket, &self->server_socket) < 0) {
         printf("Error al aceptar un cliente");
         socket_close(&self->server_socket);
         return;
@@ -35,15 +35,13 @@ void server_cipher_message(server_t* self, char* key){
 
     while ((msg_received_length = server_receive_length_msg(self)) > 0) {
         socket_receive(&self->client_socket, buf, msg_received_length);
-        int* numeric_msg;
         hill_filter_message((char *) buf);
         int numeric_msg_length = hill_calculate_dimension(&cipher, buf);
-        numeric_msg = (int *) malloc(numeric_msg_length * sizeof(int));
+        int numeric_msg[numeric_msg_length];
         hill_cipher(&cipher, buf, numeric_msg);
         //SEND---------------------------------------------------
         server_send_length_msg(self, numeric_msg_length);
         server_send_numeric(self, numeric_msg, numeric_msg_length);
-        free(numeric_msg);
         memset(buf, 0 ,sizeof(buf));
     }
     hill_destroy(&cipher);
@@ -66,9 +64,9 @@ void server_send_length_msg(server_t* self, int length){
     uint16_t msg_length = length;
     msg_length = htons(msg_length);
     unsigned char buffer[sizeof(msg_length)];
-    memcpy(buffer, (char*)&msg_length,sizeof(uint16_t));
+    memcpy(buffer, (char*)&msg_length,sizeof(msg_length));
 
-    socket_send(&self->client_socket, buffer, sizeof(uint16_t));
+    socket_send(&self->client_socket, buffer, sizeof(buffer));
 }
 
 void server_send_numeric(server_t* self, int* numeric_msg,
@@ -76,13 +74,13 @@ void server_send_numeric(server_t* self, int* numeric_msg,
     for (int i = 0; i < numeric_msg_length; i++){
         uint32_t send_int = htonl((uint32_t) numeric_msg[i]);
         unsigned char buffer[sizeof(send_int)];
-        memcpy(buffer, (char*)&send_int,sizeof(uint32_t));
+        memcpy(buffer, (char*)&send_int,sizeof(send_int));
 
-        socket_send(&self->client_socket, buffer, sizeof(uint32_t));
+        socket_send(&self->client_socket, buffer, sizeof(buffer));
     }
 }
 
-void server_close(server_t* self){
+void server_close(server_t* self) {
     if (self == NULL) {
         printf("Error al cerrar el servidor, self es nulo.");
         return;

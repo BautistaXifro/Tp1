@@ -4,6 +4,7 @@
 
 #define BUF_MAX_LEN 255
 #define LENGTH_MSG 2
+#define SIZEOFUNIT 4
 
 int client_init(client_t* self, char* server_name, char* port) {
     if (self == NULL) return -1;
@@ -11,6 +12,7 @@ int client_init(client_t* self, char* server_name, char* port) {
 
     if (socket_connect(&self->socket, server_name, port)) {
         printf("Error al conectarse al servidor.");
+        client_close(self);
         return -1;
     }
 
@@ -27,18 +29,15 @@ int client_send(client_t* self,char* file_name){
     unsigned char msg[BUF_MAX_LEN];
 
     while (file_reader_read(&file_reader, (char *) msg, BUF_MAX_LEN) == 0) {
-        int* cipher_numeric_msg;
-        
         int aux =  strlen((char *) msg);
         client_send_length_msg(self,aux);
         socket_send(&self->socket, msg, aux);
         //RECEIVE----------------------------------------
         int length_numeric_msg = client_receive_length_msg(self);
-        cipher_numeric_msg = malloc(length_numeric_msg * sizeof(int));
+        int cipher_numeric_msg[length_numeric_msg];
         client_receive_numeric(self, cipher_numeric_msg, length_numeric_msg);
         memset(msg, 0, sizeof(msg));
         char_maping(msg,cipher_numeric_msg, length_numeric_msg);
-        free(cipher_numeric_msg);
         printf("%s", msg);
         memset(msg, 0, sizeof(msg));
     }
@@ -49,11 +48,11 @@ int client_send(client_t* self,char* file_name){
 
 void client_receive_numeric(client_t* self, int* cipher_numeric_msg,
                             int length_numeric_msg){
-    unsigned char buffer[sizeof(uint32_t)];
+    unsigned char buffer[SIZEOFUNIT];
     for (int i = 0; i < length_numeric_msg; i++){
-        socket_receive(&self->socket, buffer, sizeof(uint32_t));
+        socket_receive(&self->socket, buffer, sizeof(buffer));
         uint32_t aux = *(uint32_t*)(buffer);
-        cipher_numeric_msg[i] = (int) ntohl((uint32_t) aux);
+        cipher_numeric_msg[i] = (int) ntohl(aux);
     }
 }
 
@@ -62,14 +61,14 @@ void client_send_length_msg(client_t* self, int length){
     msg_length = htons(msg_length);
     unsigned char buffer[sizeof(msg_length)];
 
-    memcpy(buffer, (char*)&msg_length,sizeof(uint16_t));
+    memcpy(buffer, (char*)&msg_length,sizeof(msg_length));
 
-    socket_send(&self->socket, buffer, sizeof(uint16_t));
+    socket_send(&self->socket, buffer, sizeof(buffer));
 }
 
 int client_receive_length_msg(client_t* self){
-    unsigned char buffer[sizeof(uint16_t)];
-    if (socket_receive(&self->socket, buffer, LENGTH_MSG) <= 0){
+    unsigned char buffer[LENGTH_MSG];
+    if (socket_receive(&self->socket, buffer, sizeof(buffer)) <= 0){
         return -1;
     }
     uint16_t max_bytes = *(uint16_t*)(buffer);
@@ -79,119 +78,13 @@ int client_receive_length_msg(client_t* self){
 }
 
 void char_maping(unsigned char* string, int* array, int size){
-    for (int i = 0; i < size; i++){
-        string[i + 1] = '\n';
-        switch (array[i])
-        {
-        case 0:
-            string[i] = 'A';
-            break;
-
-        case 1:
-            string[i] = 'B';
-            break;
-        
-        case 2:
-            string[i] = 'C';
-            break;
-
-        case 3:
-            string[i] = 'D';
-            break;
-
-        case 4:
-            string[i] = 'E';
-            break;
-
-        case 5:
-            string[i] = 'F';
-            break;
-
-        case 6:
-            string[i] = 'G';
-            break;
-                
-        case 7:
-            string[i] = 'H';
-            break;
-          
-        case 8:
-            string[i] = 'I';
-            break;
-            
-        case 9:
-            string[i] = 'J';
-            break;
-          
-        case 10:
-            string[i] = 'K';
-            break;
-                
-        case 11:
-            string[i] = 'L';
-            break;
-                
-        case 12:
-            string[i] = 'M';
-            break;
-                
-        case 13:
-            string[i] = 'N';
-            break;
-         
-        case 14:
-            string[i] = 'O';
-            break;
- 
-        case 15:
-            string[i] = 'P';
-            break;
-        
-        case 16:
-            string[i] = 'Q';
-            break;
-        
-        case 17:
-            string[i] = 'R';
-            break;
-        
-        case 18:
-            string[i] = 'S';
-            break;
- 
-        case 19:
-            string[i] = 'T';
-            break;
-           
-        case 20:
-            string[i] = 'U';
-            break;
-             
-        case 21:
-            string[i] = 'V';
-            break;
-          
-        case 22:
-            string[i] = 'W';
-            break;
-                
-        case 23:
-            string[i] = 'X';
-            break;
-                
-        case 24:
-            string[i] = 'Y';
-            break;
-                
-        case 25:
-            string[i] = 'Z';
-            break;
-
-        default:
-            printf("Error no es un int\n"); 
-            break;
-        } 
+    int i;
+    for (i = 0; i < size; i++){
+        char char_value = (char) (array[i] + 65);
+        string[i] = char_value;
     }
+    string[i] = '\n';
+    string[i + 1] = '\0';
 }
 
 void client_close(client_t* self) {

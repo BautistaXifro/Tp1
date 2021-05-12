@@ -49,6 +49,7 @@ int socket_connect(socket_t* self, const char* hostname, const char* port) {
     }
     if (self->fd == -1) {
         fprintf(stderr, "Unable to connect\n");
+        freeaddrinfo(head);
         return -1;
     }
 
@@ -98,10 +99,11 @@ int socket_accept(socket_t* self, socket_t* server) {
     if (fd < 0){
         perror("acept");
         printf("%sn",strerror(errno));
+        return -1;
     }
     self->fd = fd;
 
-    return fd == -1;
+    return 0;
 }
 
 int socket_receive(socket_t* self, unsigned char* buffer, int msg_length){
