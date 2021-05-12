@@ -34,12 +34,13 @@ int client_send(client_t* self,char* file_name){
         socket_send(&self->socket, msg, aux);
         //RECEIVE----------------------------------------
         int length_numeric_msg = client_receive_length_msg(self);
-        int cipher_numeric_msg[BUF_MAX_LEN + 3];
+        int* cipher_numeric_msg = malloc(length_numeric_msg * sizeof(int));
         client_receive_numeric(self, cipher_numeric_msg, length_numeric_msg);
         memset(msg, 0, sizeof(msg));
         char_maping(msg,cipher_numeric_msg, length_numeric_msg);
         printf("%s", msg);
         memset(msg, 0, sizeof(msg));
+        free(cipher_numeric_msg);
     }
     file_reader_destroy(&file_reader);
     client_close(self);

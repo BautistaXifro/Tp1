@@ -37,12 +37,13 @@ void server_cipher_message(server_t* self, char* key){
         socket_receive(&self->client_socket, buf, msg_received_length);
         hill_filter_message((char *) buf);
         int numeric_msg_length = hill_calculate_dimension(&cipher, buf);
-        int numeric_msg[BUF_MAX_LEN + 3];
+        int* numeric_msg = malloc(numeric_msg_length * sizeof(int));
         hill_cipher(&cipher, buf, numeric_msg);
         //SEND---------------------------------------------------
         server_send_length_msg(self, numeric_msg_length);
         server_send_numeric(self, numeric_msg, numeric_msg_length);
         memset(buf, 0 ,sizeof(buf));
+        free(numeric_msg);
     }
     hill_destroy(&cipher);
     server_close(self);
