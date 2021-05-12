@@ -72,13 +72,16 @@ void server_send_length_msg(server_t* self, int length){
 
 void server_send_numeric(server_t* self, int* numeric_msg,
                         int numeric_msg_length){
+    unsigned char buffer[numeric_msg_length];
     for (int i = 0; i < numeric_msg_length; i++){
-        uint16_t send_int = htons((uint16_t) numeric_msg[i]);
-        unsigned char buffer[sizeof(send_int)];
-        memcpy(buffer, (char*)&send_int,sizeof(send_int));
-
-        socket_send(&self->client_socket, buffer, sizeof(buffer));
+        union{
+            uint16_t number;
+            unsigned char send_number[2];
+        }bytes;
+        bytes.number = htons((uint16_t) numeric_msg[i]);
+        buffer[i] = bytes.send_number[1];
     }
+    socket_send(&self->client_socket, buffer, sizeof(buffer));
 }
 
 void server_close(server_t* self) {

@@ -49,11 +49,16 @@ int client_send(client_t* self,char* file_name){
 
 void client_receive_numeric(client_t* self, int* cipher_numeric_msg,
                             int length_numeric_msg){
-    unsigned char buffer[LENGTH_MSG];
+    unsigned char buffer[length_numeric_msg];
+    socket_receive(&self->socket, buffer, sizeof(buffer));
     for (int i = 0; i < length_numeric_msg; i++){
-        socket_receive(&self->socket, buffer, sizeof(buffer));
-        uint16_t aux = *(uint16_t*)(buffer);
-        cipher_numeric_msg[i] = (int) ntohs(aux);
+        union{
+            uint16_t number;
+            unsigned char received_number[2];
+        }bytes;
+        bytes.number = 0;
+        bytes.received_number[1] = buffer[i];
+        cipher_numeric_msg[i] = (int) ntohs(bytes.number);
     }
 }
 
