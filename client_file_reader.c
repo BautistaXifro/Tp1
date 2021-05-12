@@ -20,10 +20,12 @@ int file_reader_read(file_reader_t* self, char* buf, unsigned int bufLength) {
         return -1;
     }
 
-    while (fgets(buf, bufLength, self->file) != NULL){
-        if (strcmp(buf, "\n") == 0){
+    while (fgets(buf, bufLength, self->file) != NULL) {
+        if (strcmp(buf, "\n") == 0) {
             continue;
-        }else return 0;
+        } else {
+            return 0;
+        }
     }
     return 1;
 }
