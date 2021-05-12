@@ -27,6 +27,20 @@ Primero veremos la secuencia del programa cuando el ```client_main``` envía un 
 
 Comienza por crear ```Client``` el cual se encarga de crear a ```Socket``` para conectarse con este al servidor, también el Cliente recibe el **filename** para luego crear el ```file_reader``` el cual le retornara el mensaje leído y mediante un loop en el cual se va a llevar la conversación entre él y el servidor hasta que no tenga mas mensajes para enviar. Cuando este termina cierra ```Socket y file_reader``` si todo sale correctamente retorna 0 a ```Client_main``` y por ultimo este cierra ```Client```.
 
+###Aclaración
+```
+int length_numeric_msg = client_receive_length_msg(self);
+int* cipher_numeric_msg = malloc(length_numeric_msg * sizeof(int));
+client_receive_numeric(self, cipher_numeric_msg, length_numeric_msg);
+memset(msg, 0, sizeof(msg));
+char_maping(msg,cipher_numeric_msg, length_numeric_msg);
+printf("%s", msg);
+memset(msg, 0, sizeof(msg));
+free(cipher_numeric_msg);
+
+```
+en esta parte del código decidí alocar memoria en el heap con un malloc ya que el vector donde se recibe el mensaje numérico cifrado mandado por el servidor es de tamaño dinámico y depende de la longitud del mensaje y de la dimensión de la key dentro del cifrado.
+
 ###Servidor a Cliente
 A continuación se vera el diagrama de secuencia de lo que ocurre en ```Server_main``` cuando se recibe un mensaje para cifrar.
 
