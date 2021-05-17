@@ -7,10 +7,10 @@
 ## Introducción
 En este primer trabajo práctico se busca nivelarnos a nosotros, los alumnos, en el lenguaje de programación C y en varias buenas practicas de programación en general. Para esto se nos pide programar usando TDA y se nos introduce a la programación de redes.
 
-###Nota
+### Nota
 **El softwar utilizado para crear los modelos fue Astah, si bien los trata como si fueran clases en C estas no existen.**
 
-##Diseño
+## Diseño
 Este proyecto presenta varios archivos distintos donde se representan por ```server_``` estos son los archivos que utiliza el servidor, lo mismo ocurre con ```client_``` para los archivos que utiliza el cliente y ```common_``` para aquellos que usan ambos, la ultima distinción es ```_main``` para aquellos donde se llaman a todas la otras funciones y verifican sus outputs.
 
 En mi caso ```server_hill_cipher``` es el encargado de cifrar el mensaje al recibirlo por parámetro y devolver un vector de enteros con el valor especificado. Luego en para el cliente ```client_file_reader```
