@@ -7,7 +7,7 @@
 ## Introducción
 En este primer trabajo práctico se busca nivelarnos a nosotros, los alumnos, en el lenguaje de programación C y en varias buenas practicas de programación en general. Para esto se nos pide programar usando TDA y se nos introduce a la programación de redes.
 
-######Nota
+###Nota
 **El softwar utilizado para crear los modelos fue Astah, si bien los trata como si fueran clases en C estas no existen.**
 
 ##Diseño
