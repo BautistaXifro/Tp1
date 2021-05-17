@@ -18,8 +18,8 @@ el cual se encarga de abrir, leer y cerrar el archivo pasado para obtener el men
 
 <br><p align="center"><img src="img/ClassDiagram.jpeg"/></p>
 
-##Secuencia del programa
-###Cliente a Servidor
+## Secuencia del programa
+### Cliente a Servidor
 Primero veremos la secuencia del programa cuando el ```client_main``` envía un mensaje al servidor para que este sea cifrado.
 
 
@@ -27,7 +27,7 @@ Primero veremos la secuencia del programa cuando el ```client_main``` envía un 
 
 Comienza por crear ```Client``` el cual se encarga de crear a ```Socket``` para conectarse con este al servidor, también el Cliente recibe el **filename** para luego crear el ```file_reader``` el cual le retornara el mensaje leído y mediante un loop en el cual se va a llevar la conversación entre él y el servidor hasta que no tenga mas mensajes para enviar. Cuando este termina cierra ```Socket y file_reader``` si todo sale correctamente retorna 0 a ```Client_main``` y por ultimo este cierra ```Client```.
 
-###Aclaración
+### Aclaración
 ```
 int length_numeric_msg = client_receive_length_msg(self);
 int* cipher_numeric_msg = malloc(length_numeric_msg * sizeof(int));
@@ -41,7 +41,7 @@ free(cipher_numeric_msg);
 ```
 en esta parte del código decidí alocar memoria en el heap con un malloc ya que el vector donde se recibe el mensaje numérico cifrado mandado por el servidor es de tamaño dinámico y depende de la longitud del mensaje y de la dimensión de la key dentro del cifrado.
 
-###Servidor a Cliente
+### Servidor a Cliente
 A continuación se vera el diagrama de secuencia de lo que ocurre en ```Server_main``` cuando se recibe un mensaje para cifrar.
 
 
@@ -50,7 +50,7 @@ A continuación se vera el diagrama de secuencia de lo que ocurre en ```Server_m
 
 Símil al cliente comienza por crear a ```Server``` el cual crea dos ```Socket``` uno para *bindear* el servidor y otro para la comunicación con el cliente el cual lo deja en un estado de *accept* hasta que el cliente se conecte al puerto donde se encuentra el servidor. Luego el ```Server``` mediante la funcion **server_cipher_message()** crea a ```Hill_cipher``` y comienza el *loop* para la conversación con el cliente. Dentro de esta ```Server``` le envía a ```Hill_cipher``` el mensaje a cifrar y un vector de enteros a ser inicializado donde irán los enteros del cifrado. Cuando el cliente no envía mas mensajes y cierra su conversación el *loop* termina y ```Server``` cierra ```Hill_cipher``` y su socket. Por ultimo ```Server_main``` cierra ```Server```.
 
-##Conclusión
+## Conclusión
 Este tp, en lo personal, me pareció bastante complicado, tuve que dedicarle mucho tiempo, mucha búsqueda en google y repasos de las clases.
 Si bien me costo mucho entender como programar correctamente la conversación entre cliente y servidor, realmente siento que aprendí al menos lo básico respecto de este tema. Como también me sirvió para refrescar los temas como manejo de archivos y TDA.
 Dicho esto también me sirvió muchísimo para aprender varias herramientas como valgrind, gdb o makefile. Que sin estas hubiese sido realmente complicado debuguear este tp.
